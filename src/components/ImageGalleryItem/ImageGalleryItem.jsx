@@ -1,6 +1,9 @@
+import React from 'react';
+import { PropTypes } from 'prop-types';
+
 import styles from './ImageGalleryItem.module.css';
 
-export default function ImageGalleryItem({ image, onOpenModal }) {
+function ImageGalleryItem({ image, onOpenModal }) {
   return (
     <li
       key={image.id}
@@ -18,3 +21,15 @@ export default function ImageGalleryItem({ image, onOpenModal }) {
     </li>
   );
 }
+
+ImageGalleryItem.propTypes = {
+  image: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    webformatURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+  }),
+
+  onOpenModal: PropTypes.func.isRequired,
+};
+
+export default ImageGalleryItem

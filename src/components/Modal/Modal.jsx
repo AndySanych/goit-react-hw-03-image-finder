@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types';
 
 import styles from './Modal.module.css';
 
-export default class Modal extends Component {
+class Modal extends Component {
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown);
   }
@@ -13,22 +13,31 @@ export default class Modal extends Component {
   }
 
   handleKeyDown = event => {
-    event.code === 'Escape' && this.props.onClose();
+    if(event.code === 'Escape') {
+      this.props.onCloseModal();
+    } 
   };
 
   handleOverlayClick = event => {
-    event.currentTarget === event.target && this.props.onClose();
+    if(event.currentTarget === event.target) {
+      this.props.onCloseModal();
+    } 
   };
 
   render() {
     return (
       <div className={styles.Overlay} onClick={this.handleOverlayClick}>
-        <div className={styles.Modal}>{this.props.children}</div>
+        <div className={styles.Modal}>
+        {this.props.children}
+          </div>
       </div>
     );
   }
 }
 
 Modal.propTypes = {
-  onClose: PropTypes.func.isRequired,
+  onCloseModal: PropTypes.func.isRequired,
+  children: PropTypes.object.isRequired,
 };
+
+export default Modal

@@ -1,15 +1,15 @@
-import { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 
 import { toast } from 'react-toastify';
 import { AiOutlineSearch } from 'react-icons/ai';
 
 import styles from './Searchbar.module.css';
 
-export default class Searchbar extends Component {
-  static propTypes = { searchQuery: PropTypes.string };
-
-  state = { searchQuery: '' };
+class Searchbar extends Component {
+  state = {
+    searchQuery: '',
+  };
 
   handleSearchQueryChange = event => {
     this.setState({ searchQuery: event.currentTarget.value.toLowerCase() });
@@ -19,8 +19,8 @@ export default class Searchbar extends Component {
     event.preventDefault();
 
     if (this.state.searchQuery.trim() !== '') {
-      this.props.onSubmit(this.state.searchQuery);
-      this.setState({ searchQuery: '' });
+      this.props.onFormSubmit(this.state.searchQuery);
+      this.setState(this.searchQuery);
     } else toast.error('Input field must not be empty');
   };
 
@@ -47,3 +47,9 @@ export default class Searchbar extends Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+  onFormSubmit: PropTypes.func.isRequired,
+};
+
+export default Searchbar;

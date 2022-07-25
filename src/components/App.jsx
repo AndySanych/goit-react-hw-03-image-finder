@@ -13,29 +13,33 @@ import Button from './Button';
 
 import styles from './App.module.css';
 
-export default class App extends Component {
-  static propTypes = {};
 
+class App extends Component {
   state = {
+    dataImages: [],
     searchQuery: '',
-    showModal: false,
     page: 1,
-    images: [],
-    error: null,
     status: 'idle',
-    currImg: {},
+    error: null,
+    showModal: false,
+    largeImageURL: '',
+    tagImageAlt: '',
+    loader: false,
   };
+
+  
 
   componentDidUpdate(prevProps, prevState) {
     const { searchQuery, page } = this.state;
 
     if (prevState.searchQuery !== searchQuery) {
-      this.setState({ status: 'pending', page: 1 });
+      this.setState({ status: 'pending' });
 
-      PixabayApi(searchQuery)
-        .then(articles =>
+      PixabayApi(searchQuery, page)
+        .then(response =>
           this.setState({
-            images: articles,
+            dataImages: response,
+            page: 1,
             status: 'resolved',
           })
         )
@@ -44,40 +48,50 @@ export default class App extends Component {
       scroll.scrollToBottom();
     }
 
-    if (prevState.page !== page) {
+    if (prevState.page !== page && page !== 1) {
       this.setState({ status: 'pending' });
 
       PixabayApi(searchQuery, page)
-        .then(articles =>
+        .then(response =>
           this.setState(prevState => ({
-            images: [...prevState.images, ...articles],
+            dataImages: [...prevState.dataImages, ...response],
             status: 'resolved',
           }))
         )
         .catch(error => {
           this.setState({ error, status: 'rejected' });
-          toast.error(`${searchQuery} no found`);
+          toast.error(`${searchQuery} no images found`);
         });
 
       scroll.scrollToBottom();
     }
   }
 
-  toggleModal = image => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-      currImg: image,
-    }));
+  handleFormSubmit = searchQuery => {
+    this.setState({ searchQuery, dataImages: [], page: 1 });
   };
 
-  incrementPage = () => {
+  handleLoadMore = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
   };
 
-  handleSearchbarFormSubmit = searchQuery => {
-    this.setState({ searchQuery });
+  handleOpenModal = image => {
+    const { largeImageURL, tags } = image;
+    this.setState({
+      showModal: true,
+      largeImageURL: largeImageURL,
+      tagImageAlt: tags,
+    });
+  };
+
+  handleCloseModal = e => {
+    this.setState({
+      showModal: false,
+      largeImageURL: '',
+      tagImageAlt: '',
+    });
   };
 
   scrollToBottom = () => {
@@ -85,33 +99,44 @@ export default class App extends Component {
   };
 
   render() {
-    const { images, error, status, currImg, searchQuery } = this.state;
+    const { dataImages, showModal, largeImageURL, tagImageAlt, status, error, searchQuery} = this.state;
 
     return (
       <div className={styles.App}>
-        <Searchbar onSubmit={this.handleSearchbarFormSubmit} />
+        <Searchbar onFormSubmit={this.handleFormSubmit} />
+
         {status === 'idle' && <div>Free images</div>}
 
         {status === 'rejected' && <h1>{error.message}</h1>}
 
         {status === 'resolved' && (
           <>
-            <ImageGallery images={images} onOpenModal={this.toggleModal} />
-            {images.length !== 0 && <Button onLoadMore={this.incrementPage} />}
-            {images.length === 0 && <div>{searchQuery} no found</div>}
+            <ImageGallery
+              dataImages={dataImages}
+              onOpenModal={this.handleOpenModal}
+            />
+
+            {dataImages.length === 0 && <div>{searchQuery} no found</div>}
+
+            {dataImages.length >= 11 && (
+              <Button onLoadMore={this.handleLoadMore} />
+            )}
           </>
         )}
 
         {status === 'pending' && (
           <>
-            <ImageGallery images={images} onOpenModal={this.toggleModal} />
-            <Loader />
+            <ImageGallery
+              dataImages={dataImages}
+              onOpenModal={this.handleOpenModal}
+            />
+            {this.state.loader && <Loader />}
           </>
         )}
 
-        {this.state.showModal && (
-          <Modal onClose={this.toggleModal}>
-            <img src={currImg.largeImageURL} alt={currImg.tags} />
+        {showModal && (
+          <Modal onCloseModal={this.handleCloseModal}>
+            <img src={largeImageURL} alt={tagImageAlt} />
           </Modal>
         )}
         <ToastContainer autoClose={3000} />
@@ -119,3 +144,5 @@ export default class App extends Component {
     );
   }
 }
+
+export default App;

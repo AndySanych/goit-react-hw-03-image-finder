@@ -1,11 +1,14 @@
+import React from 'react';
+import { PropTypes } from 'prop-types';
+
 import ImageGalleryItem from '../ImageGalleryItem';
 
 import styles from './ImageGallery.module.css';
 
-export default function ImageGallery({ images, onOpenModal }) {
+function ImageGallery({ dataImages, onOpenModal }) {
   return (
     <ul className={styles.ImageGallery}>
-      {images.map(image => (
+      {dataImages.map(image => (
         <ImageGalleryItem
           key={image.id}
           image={image}
@@ -15,3 +18,14 @@ export default function ImageGallery({ images, onOpenModal }) {
     </ul>
   );
 }
+
+ImageGallery.propTypes = {
+  dataImages: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  onOpenModal: PropTypes.func.isRequired,
+};
+
+export default ImageGallery;
