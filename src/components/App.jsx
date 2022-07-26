@@ -13,7 +13,6 @@ import Button from './Button';
 
 import styles from './App.module.css';
 
-
 class App extends Component {
   state = {
     dataImages: [],
@@ -26,8 +25,6 @@ class App extends Component {
     tagImageAlt: '',
     loader: false,
   };
-
-  
 
   componentDidUpdate(prevProps, prevState) {
     const { searchQuery, page } = this.state;
@@ -60,7 +57,7 @@ class App extends Component {
         )
         .catch(error => {
           this.setState({ error, status: 'rejected' });
-          toast.error(`${searchQuery} no images found`);
+          toast.error(`${searchQuery} no found`);
         });
 
       scroll.scrollToBottom();
@@ -68,7 +65,7 @@ class App extends Component {
   }
 
   handleFormSubmit = searchQuery => {
-    this.setState({ searchQuery, dataImages: [], page: 1 });
+    this.setState({ searchQuery });
   };
 
   handleLoadMore = () => {
@@ -99,7 +96,15 @@ class App extends Component {
   };
 
   render() {
-    const { dataImages, showModal, largeImageURL, tagImageAlt, status, error, searchQuery} = this.state;
+    const {
+      dataImages,
+      showModal,
+      largeImageURL,
+      tagImageAlt,
+      status,
+      error,
+      searchQuery,
+    } = this.state;
 
     return (
       <div className={styles.App}>
